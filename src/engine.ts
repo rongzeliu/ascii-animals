@@ -98,6 +98,12 @@ export class AnimalEngine {
     if (this.reducedMotion.matches) this.drawStill();
   }
 
+  /** Trigger a startle (or food drop for koi) at canvas-relative coordinates (x, y). */
+  startle(x: number, y: number) {
+    if (this.reducedMotion.matches) return;
+    this.flock.startle(x, y);
+  }
+
   private resize() {
     const rect = this.canvas.getBoundingClientRect();
     if (rect.width < 1 || rect.height < 1) return;

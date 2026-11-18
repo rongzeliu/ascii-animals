@@ -241,7 +241,7 @@ export class AsciiRenderer {
   private cellGlyph = new Uint16Array(0);
 
   constructor(private canvas: HTMLCanvasElement, public tuning: Tuning) {
-    const ctx = canvas.getContext("2d", { alpha: false });
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) throw new Error("2D canvas unavailable");
     this.ctx = ctx;
     this.bg = document.createElement("canvas");
@@ -325,16 +325,13 @@ export class AsciiRenderer {
   private paintBackground() {
     const g = this.bg.getContext("2d");
     if (!g) return;
-    const { width: W, height: H, dpr, cw, ch } = this;
+    const { width: W, height: H, dpr } = this;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    g.fillStyle = rgb(...this.palette.background);
-    g.fillRect(0, 0, W, H);
-    const [gr, gg, gb, ga] = this.palette.grid;
-    paintGrid(g, W, H, cw, ch, dpr, `rgba(${gr},${gg},${gb},${(ga * this.tuning.grid).toFixed(3)})`);
+    g.clearRect(0, 0, W, H);
   }
 
   render(flock: Flock<any>, dt: number) {
-    const { ctx, dpr, cols, ch } = this;
+    const { ctx, dpr, cols, ch, width, height } = this;
     if (cols === 0) return;
     this.pen.t = flock.time;
 
@@ -347,9 +344,8 @@ export class AsciiRenderer {
     if (animal.drawAll) animal.drawAll(flock, this.pen);
     else if (animal.draw) for (const c of flock.creatures) animal.draw(c, this.pen, flock);
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.drawImage(this.bg, 0, 0);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
 
     this.drawTrail(flock.time);
 

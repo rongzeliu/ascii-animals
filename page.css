@@ -48,9 +48,18 @@
   color-scheme: dark;
 }
 
-html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+html, body, canvas {
+  margin: 0;
+  height: 100%;
+  background: transparent !important;
+  background-color: transparent !important;
+  overflow: hidden;
+}
 body { font-family: Geist, ui-sans-serif, system-ui, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
 canvas { display: block; width: 100vw; height: 100vh; font-family: "Geist Mono", ui-monospace, Menlo, monospace; touch-action: none; }
+.top-bar, .stage, .tweaks, .tweaks-open, .tweaks-tip, .bars, .note {
+  display: none !important;
+}
 button { font: inherit; color: inherit; }
 svg { display: block; }
 

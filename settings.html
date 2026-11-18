@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ASCII Animals · Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@600&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: rgba(14, 16, 26, 0.94);
+        --text: #e8ebf7;
+        --text-soft: rgba(232, 235, 247, 0.76);
+        --muted: rgba(232, 235, 247, 0.44);
+        --chip: rgba(255, 255, 255, 0.06);
+        --chip-hover: rgba(255, 255, 255, 0.13);
+        --chip-edge: rgba(255, 255, 255, 0.12);
+        --accent: #7aa2ff;
+        --danger: #ff7a7a;
+        --danger-bg: rgba(255, 90, 90, 0.15);
+        color-scheme: dark;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Geist, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        font-size: 12px;
+        -webkit-font-smoothing: antialiased;
+        user-select: none;
+        overflow: hidden;
+      }
+      .shell {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        border: 1px solid var(--chip-edge);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--chip-edge);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      header h1 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+      .head-actions {
+        display: flex;
+        flex-shrink: 0;
+        gap: 6px;
+      }
+      .btn {
+        height: 24px;
+        padding: 0 9px;
+        border: 1px solid var(--chip-edge);
+        border-radius: 999px;
+        background: var(--chip);
+        color: var(--text-soft);
+        font: 500 11px inherit;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+      }
+      .btn:hover { background: var(--chip-hover); color: var(--text); }
+      .btn:focus:not(:focus-visible), .animal-pill:focus:not(:focus-visible) { outline: none; }
+      .btn:focus-visible, .animal-pill:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+      }
+      .btn.danger {
+        color: var(--danger);
+        background: var(--danger-bg);
+        border-color: rgba(255, 120, 120, 0.35);
+      }
+      .btn.danger:hover {
+        background: rgba(255, 90, 90, 0.25);
+        color: #ffb4b4;
+      }
+      .animals {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--chip-edge);
+      }
+      .interact-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 14px;
+        border-bottom: 1px solid var(--chip-edge);
+        background: rgba(255, 255, 255, 0.015);
+      }
+      .interact-bar .row {
+        width: 100%;
+        padding: 0;
+        cursor: pointer;
+      }
+      .animal-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 26px;
+        padding: 0 10px;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        background: var(--chip);
+        color: var(--text-soft);
+        font: 500 12px inherit;
+        cursor: pointer;
+      }
+      .animal-pill:hover { background: var(--chip-hover); color: var(--text); }
+      .animal-pill.active {
+        background: rgba(122, 162, 255, 0.18);
+        border-color: rgba(122, 162, 255, 0.45);
+        color: #fff;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      .controls {
+        flex: 1;
+        overflow-y: auto;
+        padding: 4px 14px 14px;
+      }
+      .group h3 {
+        margin: 12px 0 5px;
+        font: 600 10px/1 "Geist Mono", ui-monospace, monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        column-gap: 8px;
+        padding: 4px 0;
+        color: var(--text-soft);
+      }
+      .row.off { opacity: 0.4; }
+      .val {
+        font: 600 11px "Geist Mono", ui-monospace, monospace;
+        color: var(--text);
+      }
+      .row input[type="range"] {
+        grid-column: 1 / -1;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 16px;
+        margin: 2px 0 0;
+        background: transparent;
+        cursor: pointer;
+      }
+      .row input[type="range"]::-webkit-slider-runnable-track {
+        height: 4px;
+        border-radius: 2px;
+        background: linear-gradient(to right, var(--accent) var(--fill, 50%), var(--chip-edge) var(--fill, 50%));
+      }
+      .row input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 13px;
+        height: 13px;
+        margin-top: -4.5px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+      }
+      .row input[type="checkbox"] {
+        -webkit-appearance: none;
+        appearance: none;
+        position: relative;
+        width: 30px;
+        height: 17px;
+        margin: 0;
+        border-radius: 999px;
+        background: var(--chip-edge);
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .row input[type="checkbox"]::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #fff;
+        transition: translate 0.2s;
+      }
+      .row input[type="checkbox"]:checked { background: var(--accent); }
+      .row input[type="checkbox"]:checked::after { translate: 13px 0; }
+      footer.credits {
+        padding: 7px 12px;
+        border-top: 1px solid var(--chip-edge);
+        background: rgba(255, 255, 255, 0.015);
+        font-size: 10px;
+        line-height: 1.35;
+        color: var(--muted);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <h1>ASCII Animals</h1>
+        <div class="head-actions">
+          <button type="button" id="toggle-vis" class="btn">Hide</button>
+          <button type="button" id="reset-btn" class="btn">Reset</button>
+          <button type="button" id="quit-btn" class="btn danger">Quit</button>
+        </div>
+      </header>
+      <div id="animals" class="animals"></div>
+      <div class="interact-bar">
+        <label class="row" title="Animals react (startle, dart, leap, or feed koi) when you click anywhere on your desktop">
+          <span>Click reactions</span>
+          <input type="checkbox" id="toggle-interact" checked />
+        </label>
+      </div>
+      <div id="controls" class="controls"></div>
+      <footer class="credits">
+        Original art &amp; engine by Stephen Zhang (github.com/DesignerStephen1/ascii-animals) &amp; drewdi (MIT)
+      </footer>
+    </div>
+    <script type="module" src="/settings.ts"></script>
+  </body>
+</html>

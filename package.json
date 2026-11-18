@@ -4,14 +4,56 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "overlay.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "typecheck": "tsc --noEmit"
+    "build:helper": "mkdir -p build && swiftc -O scripts/click-monitor.swift -o build/click-monitor",
+    "typecheck": "tsc --noEmit",
+    "start:overlay": "electron overlay.js",
+    "dist:mac": "npm run build && npm run build:helper && electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.asciianimals.overlay",
+    "productName": "ASCII Animals",
+    "files": [
+      "dist/**/*",
+      "overlay.js",
+      "preload.cjs",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build/click-monitor",
+        "to": "click-monitor"
+      }
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "mac": {
+      "category": "public.app-category.entertainment",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "identity": null
+    }
   },
   "devDependencies": {
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0",
     "typescript": "^5.6.0",
     "vite": "^6.0.0"
-  }
+  },
+  "description": "Animals drawn as ASCII on a canvas, crossing the screen along one course. Zero dependencies.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DesignerStephen1/ascii-animals.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/DesignerStephen1/ascii-animals/issues"
+  },
+  "homepage": "https://github.com/DesignerStephen1/ascii-animals#readme"
 }

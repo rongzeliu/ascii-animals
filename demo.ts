@@ -50,6 +50,75 @@ function controlsFor(key: AnimalKey) {
 
 let tweaks = mountTweakPanel(engine, ANIMALS[animal].defaults, controlsFor(animal), { storageKey: storageKey(animal) });
 
+interface OverlayState {
+  animal: AnimalKey;
+  tuning: Tuning;
+}
+
+declare global {
+  interface Window {
+    overlayAPI?: {
+      sendState: (state: OverlayState) => void;
+      onState: (cb: (state: OverlayState) => void) => () => void;
+      requestState: () => void;
+      onRequestState: (cb: () => void) => () => void;
+      setAnimal: (animal: AnimalKey) => void;
+      onSetAnimal: (cb: (animal: AnimalKey) => void) => () => void;
+      setKnob: (key: string, value: number | boolean) => void;
+      onSetKnob: (cb: (key: string, value: number | boolean) => void) => () => void;
+      resetAnimal: () => void;
+      onResetAnimal: (cb: () => void) => () => void;
+      setVisible: (visible: boolean) => void;
+      setInteraction: (enabled: boolean) => void;
+      onInteraction: (cb: (enabled: boolean) => void) => () => void;
+      onStartle: (cb: (x: number, y: number) => void) => () => void;
+      quit: () => void;
+    };
+  }
+}
+
+function selectAnimal(value: AnimalKey) {
+  animal = value;
+  engine.setAnimal(animal);
+  tweaks.destroy();
+  tweaks = mountTweakPanel(engine, ANIMALS[animal].defaults, controlsFor(animal), { storageKey: storageKey(animal) });
+  try {
+    localStorage.setItem(STORE + "animal", animal);
+  } catch {
+    // Not remembered across visits, that's all.
+  }
+  window.overlayAPI?.sendState({ animal, tuning: { ...engine.tuning } });
+}
+
+if (window.overlayAPI) {
+  window.overlayAPI.onRequestState(() => {
+    window.overlayAPI?.sendState({ animal, tuning: { ...engine.tuning } });
+  });
+  window.overlayAPI.onSetAnimal((next) => {
+    if (isAnimal(next)) selectAnimal(next);
+  });
+  window.overlayAPI.onSetKnob((key, value) => {
+    engine.set(key, value);
+    tweaks.sync();
+    window.overlayAPI?.sendState({ animal, tuning: { ...engine.tuning } });
+  });
+  window.overlayAPI.onResetAnimal(() => {
+    const defs = ANIMALS[animal].defaults;
+    for (const key of Object.keys(defs)) engine.set(key, defs[key]);
+    try {
+      localStorage.removeItem(storageKey(animal));
+    } catch {
+      // Ignore storage errors.
+    }
+    tweaks.sync();
+    window.overlayAPI?.sendState({ animal, tuning: { ...engine.tuning } });
+  });
+  window.overlayAPI.onStartle((x, y) => {
+    engine.startle(x, y);
+  });
+  window.overlayAPI.sendState({ animal, tuning: { ...engine.tuning } });
+}
+
 // Open in two tabs? When the other one saves tweaks for this animal, reload, so this tab never
 // writes its stale settings back over the newer ones.
 window.addEventListener("storage", (e) => {
@@ -62,17 +131,7 @@ mountChoices(
   document.querySelector<HTMLElement>(".choices")!,
   ANIMAL_KEYS.map((key) => ({ value: key, label: ANIMALS[key].label, swatch: `rgb(${ANIMALS[key].swatch.join(",")})` })),
   animal,
-  (value) => {
-    animal = value as AnimalKey;
-    engine.setAnimal(animal);
-    tweaks.destroy();
-    tweaks = mountTweakPanel(engine, ANIMALS[animal].defaults, controlsFor(animal), { storageKey: storageKey(animal) });
-    try {
-      localStorage.setItem(STORE + "animal", animal);
-    } catch {
-      // Not remembered across visits, that's all.
-    }
-  },
+  (value) => selectAnimal(value as AnimalKey),
 );
 
 mountComposer();
