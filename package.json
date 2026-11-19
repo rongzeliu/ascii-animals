@@ -16,6 +16,7 @@
   "build": {
     "appId": "com.asciianimals.overlay",
     "productName": "ASCII Animals",
+    "afterPack": "scripts/after-pack.cjs",
     "files": [
       "dist/**/*",
       "overlay.js",
